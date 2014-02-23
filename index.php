@@ -1,30 +1,69 @@
 <?php
-	// load config
-	require_once('config.php');
+	require_once('settings.php');
+	require_once('inc/rb.php');
+	require_once('inc/functions.php');
 
-	// load RedBean
-	require_once(join(DS, array(INC_PATH, 'rb.php')));
+	touch(basepath . "db/db.sqlite");
+	R::setup("sqlite:" . basepath . "db/db.sqlite");
 
-	// get page and make sure it has the correct format
-	// characters a to z case insensitive
-	$_page = isset($_GET['page']) ? $_GET['page'] : 'index';
+	$page = trim(str_replace('/', '_', $_GET['p']));
 
-	if (!preg_match("/^[a-z]+$/i", $_page)) {
-		$_page = 'error';
+
+	$sid = "";
+	if ($page == 'login' && isset($_POST['username']) && isset($_POST['password']))
+	{
+		$sid = checklogin();
+	}
+	elseif ($page == 'logout') {
+		setcookie("sid", "");
+		$page = "login";
+	}
+	else {
+		$sid = $_COOKIE['sid'];
 	}
 
-	// do routing
-	switch ($_page) {
-		default:
-			$template_path = join(DS, array(TEMPL_PATH, $_page . '.php'));
+	$current_user = NULL;
 
-			if (file_exists($template_path)) {
-				require_once($template_path);
-			}
-			else {
-				echo '404';
-			}
-			break;
+	
+	if (strlen($sid) > 0) {
+		$current_user =  R::findOne('user', ' sid = ? ', array($sid));
+		if (!isset($current_user)) {
+			setcookie("sid", "");
+		}
+	}
+	else {
+		setcookie("sid", "");
 	}
 
+	$adminuser = R::findOne('user', ' name = ? ', array('admin'));
+	if (strlen($page) == 0) 
+	{
+		if (isset($current_user))
+			$page = "dashboard";
+		else
+			$page = "login";
+	}
+
+	if (!isset($adminuser))
+		$page = "setup";
+
+	define("loaded", true);
+
+	require_once("header.php");
+
+	$ppath = "inc/page." . $page . ".inc";
+	if (!file_exists($ppath))
+	{
+?>
+		<div class="alert alert-error">
+			<strong>Achtung:</strong> Seite nicht gefunden.
+		</div>
+<?php
+	}
+	else {
+		require_once($ppath);
+	}
+	
+
+	require_once("footer.php");
 ?>
