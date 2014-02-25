@@ -23,6 +23,27 @@
 
 			if (isset($user))
 			{
+				if ($user->id == 1) {
+					// update host data
+					$hosts = getavailablehosts();
+
+					foreach ($hosts as $ahost) {
+						$host = R::findOne('host', 'domain = ?', array( $ahost->domain ));
+						if (!$host) {
+							$host = R::dispense('host');
+							$host->domain = $ahost->domain;
+							R::store($host);
+						}
+					}
+
+					$allhosts = R::findAll('host');
+
+					foreach ($allhosts as $singlehost) {
+						$user->sharedHost[$singlehost->id] = $singlehost;
+					}
+
+					R::store($user);
+				}
 ?>
 				<div class="alert alert-success">
 					<p><strong>Erfolgreich eingeloggt!</strong><a href="index.php?p=dashboard" class="btn btn-primary btn-medium pull-right">Zum Dashboard &raquo;</a></p>

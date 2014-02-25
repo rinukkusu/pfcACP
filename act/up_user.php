@@ -2,7 +2,7 @@
 	require_once('../settings.php');
 	require_once('../inc/functions.php');
 	require_once('../inc/rb.php');
-	R::setup(sqlite_con_string);
+	R::setup(mysql_con_string, "root", "");
 
 	$current_user = NULL;
 	$sid = $_COOKIE['sid'];
