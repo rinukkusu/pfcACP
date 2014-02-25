@@ -37,6 +37,12 @@
 						<div class="alert alert-error"><strong>Achtung: </strong>Benutzer existiert bereits.</div>
 <?php
 			}
+			elseif (!array_key_exists($mainhost, $current_user->sharedHost)) {
+				$error = true;
+?>
+						<div class="alert alert-error"><strong>Achtung: </strong>Keine Berechtigung für diese Domain.</div>
+<?php				
+			}
 			else {
 				$host = R::findOne('host', 'id = ?', array( $mainhost ));
 
