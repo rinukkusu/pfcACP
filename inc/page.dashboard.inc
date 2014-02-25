@@ -38,9 +38,15 @@
 							$newmailuser = isset($_POST['newmailuser']) ? $_POST['newmailuser'] : NULL;
 							$newmailhost = isset($_POST['newmailhost']) ? $_POST['newmailhost'] : 0;
 							$submitted_mail = isset($_POST['submit_mail']) ? true : false;
+							
 
 							if ($submitted_mail) {
-								if (strlen($newmailuser) > 0 && $newmailhost > 0) {
+								if (!array_key_exists($newmailhost, $current_user->sharedHost)) {
+									?>
+										<div class="alert alert-error"><strong>Achtung: </strong>Keine Berechtigung für diese Domain.</div>
+									<?php				
+								}
+								elseif (strlen($newmailuser) > 0 && $newmailhost > 0) {
 									$host = R::findOne('host', 'id = ?', array( $newmailhost ));
 									$newmail = $newmailuser."@".$host->domain;
 
