@@ -14,5 +14,9 @@
 	// helper defines
 	define("baseurl", "http://rinukkusu.sub-r.de/pfcACP/");
 	define("basepath", "/home/rinukkusu/www/pfcACP/");
+	define("mailpath", "sub-r.de/mails/pfcACP/");
+
+	define("psql_con_string", "host=localhost dbname=mails user=postgres password=");
+	define("mysql_con_string", "mysql:host=localhost;dbname=pfcacp");
 
 ?>

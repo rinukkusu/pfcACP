@@ -12,6 +12,54 @@
 		<meta name="author" content="">
 
 		<script type="text/javascript">
+			function removeElement($table, $record)
+			{
+				$('#u' + $record).remove();
+			}
+			function timedRefresh(timeoutPeriod) {
+				setTimeout("location.reload(true);",timeoutPeriod);
+			}
+			function editElement($record)
+			{
+				$('#edit_' + $record).show(400);
+				$('#elm_' + $record).hide();
+				
+			}
+			function canceleditElement($record)
+			{
+				$('#elm_' + $record).show(400);
+				$('#edit_' + $record).hide();
+				
+			}
+			function saveUser($record)
+			{
+				$('#errormsg').hide();
+
+				var $username = $('#username' + $record).val();
+				var $isadmin = $('#isadmin' + $record).is(':checked') ? 1 : 0;
+
+				//alert($record + "\r\n" + $username + "\r\n" + $mail + "\r\n" + $isadmin);
+
+				$.get('act/up_user.php', { id: $record, name: $username, isadmin: $isadmin }, 
+					function(data) 
+					{
+						if (data == '1')
+						{
+							$('#elm_username_' + $record).html($username);
+							if ($isadmin == 1)
+								$('#elm_isadmin_' + $record).html("<i class='icon-ok'></i>");
+							else
+								$('#elm_isadmin_' + $record).html("");
+
+							canceleditElement($record);
+						} 
+						else
+						{
+							$('#errormsg').html("<strong>Achtung: </strong>" + data.replace(/\r\n/g, "<br />"));
+							$('#errormsg').show(800);
+						}
+					});
+			}
 			function setCurrentTime()
 			{
 				$.get('act/get_time_h.php', { }, 

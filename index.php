@@ -3,8 +3,7 @@
 	require_once('inc/rb.php');
 	require_once('inc/functions.php');
 
-	touch(basepath . "db/db.sqlite");
-	R::setup("sqlite:" . basepath . "db/db.sqlite");
+	R::setup(mysql_con_string, "root", "");
 
 	$page = trim(str_replace('/', '_', $_GET['p']));
 

@@ -2,16 +2,21 @@
 
 	function encryptpassword($password)
 	{
-		$first = md5($password . salt_key1);
-		$second = md5(substr($first, -8) . salt_key2 . substr($first, 0, 8));
+		//$first = md5($password . salt_key1);
+		//$second = md5(substr($first, -8) . salt_key2 . substr($first, 0, 8));
 
-		return $second;
+		return crypt($password);
 	}
 
 	function getuserbylogin($user, $password)
 	{
-		$encryptedpw = encryptpassword($password);
-		return R::findOne('user', ' name = ? AND password = ? ', array($user, $encryptedpw));
+		$potential_user = R::findOne('user', ' name = ? ', array($user));
+
+		if (crypt($password, $potential_user->password) == $potential_user->password) {
+			return $potential_user;
+		}
+
+		return null;
 	}
 
 	function checklogin()
@@ -37,52 +42,9 @@
 		return $sid;
 	}
 
-	function creatediranduser($username, $password)
-	{
-		$home = basepath . "data/" . $username;
-		//echo $home . "<br />";
-		$old = umask(0);
-		mkdir($home, 0775);
-		umask($old);
-
-		$strUserAdd = 'sudo /usr/sbin/useradd ' . $username . ' -d ' . $home . ' -g nginx -c "' . $username . '" -s /bin/bash';
-		exec($strUserAdd, $result);
-		//var_dump($result);
-
-		$strChownDir = 'sudo /bin/chown ' . $username . ':nginx -R ' . $home;
-		exec($strChownDir, $result);
-		//var_dump($result);
-
-		$strSetPw = 'echo ' . $password . ' | sudo /usr/bin/passwd ' . $username . ' --stdin';
-		exec($strSetPw, $result);
-		//var_dump($result);
-	}
-
-	function createserverdir($server)
-	{
-		$gamefiles = gamespath . $server->game->skeleton . "/*";
-		$destdir = datapath . $server->user->name . "/" . $server->name;
-
-		$old = umask(0);
-		mkdir($destdir, 0775);
-		umask($old);
-
-		$strCopy = 'sudo /bin/cp -r ' . $gamefiles . " " . $destdir;
-		exec($strCopy, $result);
-
-		$strChownDir = 'sudo /bin/chown ' . $username . ':nginx -R ' . $home;
-		exec($strChownDir, $result);
-	}
-
-	function removediranduser($username)
-	{
-		$strUserDel = 'sudo /usr/sbin/userdel ' . $username;
-		exec($strUserAdd, $result);
-	}
-
 	function getrandomchar()
 	{
-		$c = 'ABCDEFGH-IJKLMNOPQR_STUVWXYZ012.3456789ab!cdefghijklmno*pqrstuvwxyz';
+		$c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
 		return substr($c, mt_rand(0, strlen($c)), 1);
 	}
 
@@ -171,5 +133,83 @@
 	function getserverlog($server)
 	{
 		//exec()
+	}
+
+	function getmailaccountdata($username)
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$escaped_user = pg_escape_string($username);
+		$result = pg_query($dbcon, "SELECT * FROM users WHERE userid='$escaped_user'");
+
+		$ret = array();
+		while ($mail = pg_fetch_object($result)) {
+			$ret[] = $mail;
+		}
+
+		pg_close($dbcon);
+
+		return $ret;
+	}
+
+	function getothermails($username)
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$escaped_user = pg_escape_string($username);
+
+		$result = pg_query($dbcon, "SELECT * FROM virtual WHERE userid='$escaped_user'");
+		while ($mail = pg_fetch_array($result)) {
+			$ret[] = $mail;
+		}
+
+		pg_close($dbcon);
+
+		return $ret;
+	}
+
+	function getavailablehosts()
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$result = pg_query($dbcon, "SELECT * FROM transport");
+
+		$ret = array();
+		while ($host = pg_fetch_object($result)) {
+			$ret[] = $host;
+		}
+
+		pg_close($dbcon);
+
+		return $ret;
+	}
+
+	function addmailuser($username, $host, $password)
+	{
+		// userid, password, realname, uid, gid, home, mail
+
+		// check, if user already exists
+		$dbcon = pg_connect(psql_con_string);
+
+		$escaped_user = pg_escape_string($username);
+		$result = pg_query($dbcon, "SELECT * FROM users WHERE userid='$escaped_user'");
+
+		$rows = pg_num_rows($result);
+		if ($rows == 1) {
+			$user = pg_fetch_object($result);
+
+			pg_close($dbcon);
+			return $user->password;
+		}
+		else {
+			$insertstring = "INSERT INTO users ";
+			$insertstring.= "(userid, password, realname, uid, gid, home, mail) VALUES ";
+			$insertstring.= "('$escaped_user', '$password', '$escaped_user', '1100', '100', '".mailpath."$escaped_user', '$escaped_user@$host')";
+
+			@mkdir(mailpath.$escaped_user);
+			@chmod(mailpath.$escaped_user, 0775);
+
+			pg_query($dbcon, $insertstring);
+			pg_close($dbcon);
+
+			return $password;
+		}
 	}
 ?>

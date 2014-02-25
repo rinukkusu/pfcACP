@@ -27,12 +27,32 @@
 		}
 		elseif (isset($password) && isset($mail))
 		{
+			// read out data
+			$hosts = getavailablehosts();
+
+			foreach ($hosts as $ahost) {
+				$host = R::dispense('host');
+				$host->domain = $ahost->domain;
+				R::store($host);
+			}
+
+			$allhosts = R::findAll('host');
+
+
 			$encryptedpw = encryptpassword($password);
 			$user = R::dispense('user');
 			$user->name = 'admin';
 			$user->password = $encryptedpw;
 			$user->mail = $mail;
 			$user->isadmin = true;
+			$user->created_at = date("Y-m-d H:i:s");
+
+			$user->host = $allhosts[1];
+
+			foreach ($allhosts as $singlehost) {
+				$user->sharedHost[] = $singlehost;
+			}
+
 			$id = R::store($user);
 
 			if ($id > 0)
