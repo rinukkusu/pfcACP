@@ -59,7 +59,7 @@
 
 				R::store($newuser);
 ?>
-				<div class="alert alert-success"><strong>Erfolg: </strong>Neuer Benutzer wurde erfolgreich angelegt.<?php if ($newpass == $returnpass) { echo "Das Passwort lautet: <strong>$newpass</strong>"; } ?></div>
+				<div class="alert alert-success"><strong>Erfolg: </strong>Neuer Benutzer wurde erfolgreich angelegt. <?php if ($newpass == $returnpass) { echo "Das Passwort lautet: <strong>$newpass</strong>"; } ?></div>
 <?php
 			}
 		}
