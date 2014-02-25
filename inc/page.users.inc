@@ -73,12 +73,12 @@
 
 <?php
 		$findarray = array();
-		//$findarray[] = true;
+		$findarray[] = true;
 		foreach ($current_user->sharedHost as $host) {
 			$findarray[] = $host->id;
 		}
 
-		$users = R::find('user', ' host_id IN ('.R::genSlots($current_user->sharedHost).')', $findarray);
+		$users = R::find('user', ' active = ? AND host_id IN ('.R::genSlots($current_user->sharedHost).')', $findarray);
 		foreach ($users as $user) {
 ?>
 								<tr id="elm_<?php echo $user->id; ?>" class="<?php if ($user->isadmin) echo "error"; ?>">

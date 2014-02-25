@@ -122,6 +122,7 @@
 			}
 		</style>
 		<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="assets/css/my.css" rel="stylesheet">
 	</head>
 
 	<body onload="setCurrentTime();<?php 

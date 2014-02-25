@@ -212,4 +212,28 @@
 			return $password;
 		}
 	}
+
+	function addanothermail($username, $mail)
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$escaped_user = pg_escape_string($username);
+
+		pg_query($dbcon, "INSERT INTO virtual VALUES ('$mail', '$username');");
+
+		pg_close($dbcon);
+	}
+
+	function mailexists($mail)
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$result1 = pg_query($dbcon, "SELECT * FROM users WHERE mail='$mail'");
+		$result2 = pg_query($dbcon, "SELECT * FROM virtual WHERE address='$mail'");
+
+		if (pg_num_rows($result1) == 0 && pg_num_rows($result2) == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 ?>
