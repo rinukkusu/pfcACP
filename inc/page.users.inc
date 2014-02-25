@@ -31,7 +31,7 @@
 						<div class="alert alert-error"><strong>Achtung: </strong>Kein Nutzername angegeben.</div>
 <?php			
 			}
-			elseif (R::findOne('user', ' name = ? ', array( $username ))) {
+			elseif (R::findOne('user', ' name = ? ', array( $username )) || userexists($username)) {
 				$error = true;
 ?>
 						<div class="alert alert-error"><strong>Achtung: </strong>Benutzer existiert bereits.</div>

@@ -233,4 +233,18 @@
 		return true;
 	}
 
+	function userexists($username)
+	{
+		$dbcon = pg_connect(psql_con_string);
+		$escaped_user = pg_escape_string($username);
+
+		$result = pg_query($dbcon, "SELECT * FROM users WHERE userid='$escaped_user'");
+
+		if (pg_num_rows($result) == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 ?>
