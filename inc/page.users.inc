@@ -37,6 +37,12 @@
 						<div class="alert alert-error"><strong>Achtung: </strong>Benutzer existiert bereits.</div>
 <?php
 			}
+			elseif (!array_key_exists($mainhost, $current_user->sharedHost)) {
+				$error = true;
+?>
+						<div class="alert alert-error"><strong>Achtung: </strong>Keine Berechtigung für diese Domain.</div>
+<?php				
+			}
 			else {
 				$host = R::findOne('host', 'id = ?', array( $mainhost ));
 
@@ -47,12 +53,13 @@
 				$newuser->active = true;
 				$newuser->sharedHost[] = $host;
 				$newuser->host = $host;
-				$newuser->password = addmailuser($username, $host->domain, encryptpassword($newpass));
+				$returnpass = addmailuser($username, $host->domain, encryptpassword($newpass));
+				$newuser->password = $returnpass;
 				$newuser->created_at = date("Y-m-d H:i:s");
 
 				R::store($newuser);
 ?>
-				<div class="alert alert-success"><strong>Erfolg: </strong>Neuer Benutzer wurde erfolgreich angelegt. Das Passwort lautet: <?php echo $newpass; ?></div>
+				<div class="alert alert-success"><strong>Erfolg: </strong>Neuer Benutzer wurde erfolgreich angelegt. <?php if ($newpass == $returnpass) { echo "Das Passwort lautet: <strong>$newpass</strong>"; } ?></div>
 <?php
 			}
 		}

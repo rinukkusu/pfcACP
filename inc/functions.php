@@ -141,10 +141,7 @@
 		$escaped_user = pg_escape_string($username);
 		$result = pg_query($dbcon, "SELECT * FROM users WHERE userid='$escaped_user'");
 
-		$ret = array();
-		while ($mail = pg_fetch_object($result)) {
-			$ret[] = $mail;
-		}
+		$ret = pg_fetch_object($result);
 
 		pg_close($dbcon);
 

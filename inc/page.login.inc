@@ -46,7 +46,7 @@
 				}
 ?>
 				<div class="alert alert-success">
-					<p><strong>Erfolgreich eingeloggt!</strong><a href="index.php?p=dashboard" class="btn btn-primary btn-medium pull-right">Zum Dashboard &raquo;</a></p>
+					<p><strong>Erfolgreich eingeloggt!</strong><a href="index.php?p=dashboard" class="btn btn-primary btn-mini pull-right">Weiter &raquo;</a></p>
 
 				</div>
 <?php
