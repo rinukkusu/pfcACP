@@ -94,8 +94,59 @@
 									<td id="elm_mainhost_<?php echo $user->id; ?>"><?php echo $user->host->domain; ?></td>
 									<td id="elm_isadmin_<?php echo $user->id; ?>"><?php if ($user->isadmin) echo "<i class='icon-ok'></i>"; ?></td>
 									<td>
+										<a href="#hostModal_<?php echo $user->id; ?>" role="button" data-toggle="modal" class="btn btn-mini btn-info" title="Mailhosts editieren"><i class="icon-list icon-white"></i></a>
 										<a class="btn btn-mini btn-default" title="Bearbeiten" onclick="editElement('<?php echo $user->id; ?>');"><i class="icon-edit"></i></a>
 										<a href="act/del_user.php?u=<?php echo $user->id; ?>" class="btn btn-mini btn-danger" title="L&ouml;schen"><i class="icon-trash icon-white"></i></a>
+
+										<!-- Modal -->
+										<div id="hostModal_<?php echo $user->id; ?>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel<?php echo $user->id; ?>" aria-hidden="true">
+											<div action="index.php?p=users" method="POST">
+												<div class="modal-header">
+													<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+													<h3 id="myModalLabel<?php echo $user->id; ?>">Mailhosts editieren</h3>
+												</div>
+												<div class="modal-body">
+													
+														<?php 
+														$count = 0;
+
+
+
+														foreach ($current_user->sharedHost as $host) {
+															$count++;
+
+															if ($count == 1) {
+																echo "<div class='row-fluid'>";
+															}
+
+															$checked = "";
+															if (array_key_exists($host->id, $user->sharedHost)) {
+																$checked = "checked";
+															}
+
+															echo "<div class='span4'>";
+																echo "<label class='checkbox'><input ".$checked." type='checkbox' name='assignedhosts[]' value='".$host->id."'> ".$host->domain."</label>";
+															echo "</div>";
+
+															if ($count == 3) {
+																echo "</div>";
+																$count = 0;
+															}
+														} 
+
+														if ($count != 0) {
+															echo "</div>";
+														}
+
+														?>
+
+												</div>
+												<div class="modal-footer">
+													<button class="btn" data-dismiss="modal" aria-hidden="true">Abbrechen</button>
+													<button class="btn btn-primary" type="submit" name="submit_host">Speichern</button>
+												</div>
+											</div>
+										</div>
 									</td>
 								</tr>
 								<tr class="warning" style="display: none;" id="edit_<?php echo $user->id; ?>">
@@ -108,7 +159,7 @@
 									</td>
 									<td>
 										<label class="checkbox">
-      										<input id="isadmin<?php echo $user->id; ?>" type="checkbox" <?php if ($user->isadmin) echo "checked"; ?>> Admin
+      										<input id="isadmin<?php echo $user->id; ?>" type="checkbox" <?php if ($user->isadmin) echo "checked"; ?> Admin
     									</label>
 									</td>
 									<td>
