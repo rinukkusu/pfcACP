@@ -54,6 +54,7 @@
 				$newuser->sharedHost[] = $host;
 				$newuser->host = $host;
 				$returnpass = addmailuser($username, $host->domain, encryptpassword($newpass));
+				addanothermail($username, $username.'@'.$host->domain);
 				$newuser->password = $returnpass;
 				$newuser->created_at = date("Y-m-d H:i:s");
 
